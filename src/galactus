@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+
+import os
+import json
+import logging
+import argparse
+from subprocess import Popen, PIPE
+from datetime import datetime
+
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+
+
+def environ_or_required(key):
+    return (
+        {'default': os.environ.get(key)} if os.environ.get(key)
+        else {'required': True}
+    )
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Galactus - unused GCP Service Account and Key detector')
+    parser.add_argument('-p', '--project', help='GCP Project name',
+                        **environ_or_required('GCP_PROJECT'))
+    parser.add_argument('-a', '--activity-type',
+                        help=('Activity type ('
+                              'serviceAccountLastAuthentication / '
+                              'serviceAccountKeyLastAuthentication)'
+                              ),
+                        **environ_or_required('ACTIVITY_TYPE'))
+    parser.add_argument('-l', '--limit', help='Result limit',
+                        type=int, default=1000),
+    parser.add_argument('-t', '--threshold', help='Date threshold in format "%s"' % DATE_FORMAT.replace('%', '%%'),
+                        type=lambda t: datetime.strptime(t, DATE_FORMAT),
+                        **environ_or_required('THRESHOLD'))
+    parser.add_argument('-d', '--debug', help='Enable debug logging',
+                        action='store_true')
+    return parser.parse_args()
+
+
+def init_logger(args):
+    global logger
+    level = logging.DEBUG if os.environ.get(
+        'DEBUG', args.debug) else logging.INFO
+    logging.basicConfig(
+        level=level, format='%(asctime)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger()
+
+
+def run_gcloud(args):
+    command = ['gcloud',
+               'policy-intelligence',
+               'query-activity',
+               '--activity-type=%s' % args.activity_type,
+               '--project=%s' % args.project,
+               '--limit=%d' % args.limit,
+               '--format=json'
+               ]
+    with Popen(command, stdout=PIPE) as cmd:
+        output = json.loads(cmd.stdout.read())
+    return output
+
+
+def filter_results(output, args):
+    filtered = []
+    for x in output:
+        try:
+            if datetime.strptime(x['activity']['lastAuthenticatedTime'], DATE_FORMAT) < args.threshold:
+                filtered.append(x)
+        except KeyError as e:
+            logger.debug(e)
+            continue
+    return filtered
+
+
+def print_results(results, args):
+    if not results:
+        logger.info('No results found')
+        return
+    for x in results:
+        if args.activity_type == 'serviceAccountLastAuthentication':
+            key = 'serviceAccount'
+        else:
+            key = 'serviceAccountKey'
+        a = x['activity']
+        logger.info('%s - last used %s' %
+                    (a[key]['fullResourceName'], a['lastAuthenticatedTime']))
+
+
+def main():
+    args = parse_args()
+    init_logger(args)
+    logger.debug(args)
+    logger.debug(int(args.threshold.timestamp()))
+    output = run_gcloud(args)
+    logger.debug(output)
+    filtered = filter_results(output, args)
+    logger.debug(filtered)
+    print_results(filtered, args)
+
+
+if __name__ == '__main__':
+    main()
