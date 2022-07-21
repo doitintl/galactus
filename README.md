@@ -63,7 +63,7 @@ Example manifests can be found in the [kustomize](./kustomize/) directory. Do th
 
 - update the GCP project name in [configmap.yaml](./kustomize/configmap.yaml)
 
-- if using [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity), configure the GSA with the [necessary roles](https://cloud.google.com/policy-intelligence/docs/activity-analyzer-service-account-authentication#required-permissions) and update the GSA name in [serviceaccount.yaml](./kustomize/serviceaccount.yaml)
+- if using [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity), configure the GSA with the [necessary roles](https://cloud.google.com/policy-intelligence/docs/activity-analyzer-service-account-authentication#required-permissions) and update the GSA email in [serviceaccount.yaml](./kustomize/serviceaccount.yaml)
 
 - if necessary, tweak schedule [cronjob.yaml](./kustomize/cronjob.yaml)
 
