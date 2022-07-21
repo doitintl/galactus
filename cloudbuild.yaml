@@ -1,0 +1,16 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_IMAGE}/${_IMAGE}'
+      - '-t'
+      - '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_IMAGE}/${_IMAGE}:$SHORT_SHA'
+      - 'src'
+
+substitutions:
+    _IMAGE: 'galactus'
+
+images:
+  - '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_IMAGE}/${_IMAGE}'
+  - '$LOCATION-docker.pkg.dev/$PROJECT_ID/${_IMAGE}/${_IMAGE}:$SHORT_SHA'
