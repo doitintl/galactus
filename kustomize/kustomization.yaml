@@ -8,10 +8,11 @@ commonLabels:
 
 images:
   - name: galactus
-    newName: my-registry/my-postgres
-    newTag: v1
+    newName: $IMAGE_NAME
+    newTag: latest
 
 resources:
   - configmap.yaml
   - cronjob.yaml
+  - namespace.yaml
   - serviceaccount.yaml

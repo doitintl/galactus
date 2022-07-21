@@ -7,5 +7,5 @@ data:
   ACTIVITY_TYPE: serviceAccountLastAuthentication
   # enable debug logging
   DEBUG: '1'
-  GCP_PROJECT: $GCP_PROJECT_NAME
+  GCP_PROJECT: $GCP_PROJECT
   THRESHOLD: '2022-01-01T00:00:00Z'
