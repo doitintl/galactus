@@ -1,0 +1,20 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: galactus
+spec:
+  concurrencyPolicy: Forbid
+  schedule: 0 0 * * *
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - envFrom:
+                - configMapRef:
+                    name: galactus
+              image: galactus
+              name: galactus
+          restartPolicy: Never
+          serviceAccountName: galactus

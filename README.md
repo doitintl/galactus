@@ -52,3 +52,19 @@ $ ./galactus -p test-eyal -t 2022-02-28T10:00:00Z -a serviceAccountKeyLastAuthen
 2022-07-15 17:36:52,823 - INFO - //iam.googleapis.com/projects/test-eyal/serviceAccounts/crossplane-test@test-eyal.iam.gserviceaccount.com/keys/b2edfc3fc441c9937c0c2e0da2b1345d57a02abb - last used 2022-02-28T08:00:00Z
 
 ```
+
+## Deploying to GKE
+
+Example manifests can be found in the [kustomize](./kustomize/) directory. Do the following before applying:
+
+- build and push the image: `docker build -t <MY_REGISTRY>:<MY_TAG> src && docker push <MY_REGISTRY>:<MY_TAG>`
+
+- update the registry and tag inside [kustomization.yaml](./kustomize/kustomization.yaml)
+
+- update the GCP project name in [configmap.yaml](./kustomize/configmap.yaml)
+
+- if using [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity), configure the GSA with the [necessary roles](https://cloud.google.com/policy-intelligence/docs/activity-analyzer-service-account-authentication#required-permissions) and update the GSA name in [serviceaccount.yaml](./kustomize/serviceaccount.yaml)
+
+- if necessary, tweak schedule [cronjob.yaml](./kustomize/cronjob.yaml)
+
+- apply the manifests to the cluster: `kubectl apply -k kustomize`
