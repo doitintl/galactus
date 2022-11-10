@@ -1,6 +1,7 @@
+on: [push]
 jobs:
-  job_id: 'wif-test'
-
+  job_id:
+    runs-on: ubuntu-latest
     # Add "id-token" with the intended permissions.
     permissions:
       contents: 'read'
