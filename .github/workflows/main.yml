@@ -16,7 +16,7 @@ jobs:
       uses: 'google-github-actions/auth@v1'
       with:
         workload_identity_provider: 'projects/216883757252/locations/global/workloadIdentityPools/github/providers/github'
-        service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+        service_account: 'wi-aws@test-eyal.iam.gserviceaccount.com'
 
     # Install gcloud, `setup-gcloud` automatically picks up authentication from `auth`.
     - name: 'Set up Cloud SDK'
